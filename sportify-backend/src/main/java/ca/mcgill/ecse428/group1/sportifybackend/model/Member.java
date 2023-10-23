@@ -8,6 +8,7 @@ public class Member {
 	@Id
 	private String username;
 	private String password;
+	private Gender gender;
 	private String email;
 	private String address;
 
@@ -17,6 +18,10 @@ public class Member {
 
 	public String getPassword() {
 		return password;
+	}
+
+	public Gender getGender() {
+		return gender;
 	}
 
 	public String getEmail() {
@@ -33,6 +38,10 @@ public class Member {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
 	public void setEmail(String email) {

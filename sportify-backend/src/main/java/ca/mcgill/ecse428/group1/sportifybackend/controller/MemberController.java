@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.mcgill.ecse428.group1.sportifybackend.dto.MemberDto;
+import ca.mcgill.ecse428.group1.sportifybackend.model.Gender;
 import ca.mcgill.ecse428.group1.sportifybackend.model.Member;
 import ca.mcgill.ecse428.group1.sportifybackend.service.MemberService;
 
@@ -31,8 +32,12 @@ public class MemberController {
 
 	@PostMapping(value = { "/member/{username}", "/member/{username}/" })
 	public MemberDto createMember(@PathVariable("username") String username, @RequestParam String password,
-			@RequestParam Optional<String> email, @RequestParam Optional<String> address) throws IllegalArgumentException {
+			@RequestParam Optional<Gender> gender, @RequestParam Optional<String> email,
+			@RequestParam Optional<String> address) throws IllegalArgumentException {
 		Member member = service.createMember(username, password);
+		if (gender.isPresent()) {
+			service.setMemberGender(username, gender.get());
+		}
 		if (email.isPresent()) {
 			service.setMemberEmail(username, email.get());
 		}
@@ -46,9 +51,10 @@ public class MemberController {
 	public MemberDto getMember(@PathVariable("username") String username) throws IllegalArgumentException {
 		return convertToDto(service.getMember(username));
 	}
-	
+
 	@GetMapping(value = { "/memberlogin/{username}", "/memberlogin/{username}/" })
-	public MemberDto verifyLogin(@PathVariable("username") String username, @RequestParam String password) throws IllegalArgumentException {
+	public MemberDto verifyLogin(@PathVariable("username") String username, @RequestParam String password)
+			throws IllegalArgumentException {
 		return convertToDto(service.verifyLogin(username, password));
 	}
 
@@ -59,8 +65,8 @@ public class MemberController {
 
 	@PatchMapping(value = { "/member/{username}", "/member/{username}/" })
 	public MemberDto updateMember(@PathVariable("username") String username, @RequestParam Optional<String> email,
-			@RequestParam Optional<String> password, @RequestParam Optional<String> address)
-			throws IllegalArgumentException {
+			@RequestParam Optional<String> password, @RequestParam Optional<String> address,
+			@RequestParam Optional<Gender> gender) throws IllegalArgumentException {
 		Member Member = service.getMember(username);
 		if (email.isPresent()) {
 			Member = service.setMemberEmail(username, email.get());
@@ -71,6 +77,9 @@ public class MemberController {
 		if (address.isPresent()) {
 			Member = service.setMemberAddress(username, address.get());
 		}
+		if (gender.isPresent()) {
+			Member = service.setMemberGender(username, gender.get());
+		}
 		return convertToDto(Member);
 	}
 
@@ -78,7 +87,10 @@ public class MemberController {
 		if (m == null) {
 			throw new IllegalArgumentException("Member does not exist!");
 		}
-		MemberDto memberDto = new MemberDto(m.getUsername(), m.getPassword(), m.getEmail(), m.getAddress());
+		MemberDto memberDto = new MemberDto(m.getUsername(), m.getPassword(), null, m.getEmail(), m.getAddress());
+		if (m.getGender() != null) {
+			memberDto.setGender(m.getGender().toString());
+		}
 		return memberDto;
 	}
 }

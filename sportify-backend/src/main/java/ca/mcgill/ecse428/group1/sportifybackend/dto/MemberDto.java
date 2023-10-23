@@ -4,13 +4,15 @@ public class MemberDto {
 
 	private String username;
 	private String password;
+	private String gender;
 	private String email;
 	private String address;
 
-	public MemberDto(String username, String password, String email, String address) {
+	public MemberDto(String username, String password, String gender, String email, String address) {
 		super();
 		this.username = username;
 		this.password = password;
+		this.gender = gender;
 		this.email = email;
 		this.address = address;
 	}
@@ -21,6 +23,10 @@ public class MemberDto {
 
 	public String getPassword() {
 		return password;
+	}
+
+	public String getGender() {
+		return gender;
 	}
 
 	public String getEmail() {
@@ -37,6 +43,10 @@ public class MemberDto {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 
 	public void setEmail(String email) {

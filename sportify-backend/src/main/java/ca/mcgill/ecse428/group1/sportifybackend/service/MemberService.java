@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ca.mcgill.ecse428.group1.sportifybackend.dao.MemberRepository;
+import ca.mcgill.ecse428.group1.sportifybackend.model.Gender;
 import ca.mcgill.ecse428.group1.sportifybackend.model.Member;
 
 @Service
@@ -16,8 +17,7 @@ public class MemberService {
 	MemberRepository memberRepository;
 
 	@Transactional
-	public Member createMember(String username, String password)
-			throws IllegalArgumentException {
+	public Member createMember(String username, String password) throws IllegalArgumentException {
 		if (username == null || username.trim().length() == 0) {
 			throw new IllegalArgumentException("Username cannot be empty!");
 		}
@@ -41,7 +41,7 @@ public class MemberService {
 		}
 		return member;
 	}
-	
+
 	@Transactional
 	public Member verifyLogin(String username, String password) throws IllegalArgumentException {
 		if (username == null || username.trim().length() == 0) {
@@ -55,6 +55,11 @@ public class MemberService {
 			throw new IllegalArgumentException("Wrong password!");
 		}
 		return member;
+	}
+
+	public Member setMemberGender(String username, Gender gender) throws IllegalArgumentException {
+		Member member = getMember(username);
+		return setGender(member, gender);
 	}
 
 	@Transactional
@@ -84,6 +89,11 @@ public class MemberService {
 	@Transactional
 	public List<Member> getAllMembers() {
 		return memberRepository.findAllByOrderByUsername();
+	}
+
+	private Member setGender(Member member, Gender gender) throws IllegalArgumentException {
+		member.setGender(gender);
+		return memberRepository.save(member);
 	}
 
 	private Member setPassword(Member member, String password) throws IllegalArgumentException {
