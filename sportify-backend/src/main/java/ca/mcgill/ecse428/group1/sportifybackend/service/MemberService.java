@@ -16,7 +16,7 @@ public class MemberService {
 	MemberRepository memberRepository;
 
 	@Transactional
-	public Member createMember(String username, String password, String email, String address)
+	public Member createMember(String username, String password)
 			throws IllegalArgumentException {
 		if (username == null || username.trim().length() == 0) {
 			throw new IllegalArgumentException("Username cannot be empty!");
@@ -27,8 +27,6 @@ public class MemberService {
 		Member member = new Member();
 		member.setUsername(username);
 		setPassword(member, password);
-		setEmail(member, email);
-		setAddress(member, address);
 		return memberRepository.save(member);
 	}
 
@@ -40,6 +38,21 @@ public class MemberService {
 		Member member = memberRepository.findByUsername(username);
 		if (member == null) {
 			throw new IllegalArgumentException("Member does not exist!");
+		}
+		return member;
+	}
+	
+	@Transactional
+	public Member verifyLogin(String username, String password) throws IllegalArgumentException {
+		if (username == null || username.trim().length() == 0) {
+			throw new IllegalArgumentException("Username cannot be empty!");
+		}
+		Member member = memberRepository.findByUsername(username);
+		if (member == null) {
+			throw new IllegalArgumentException("Member does not exist!");
+		}
+		if (!password.equals(member.getPassword())) {
+			throw new IllegalArgumentException("Wrong password!");
 		}
 		return member;
 	}

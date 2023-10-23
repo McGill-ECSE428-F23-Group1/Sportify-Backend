@@ -31,14 +31,25 @@ public class MemberController {
 
 	@PostMapping(value = { "/member/{username}", "/member/{username}/" })
 	public MemberDto createMember(@PathVariable("username") String username, @RequestParam String password,
-			@RequestParam String email, @RequestParam String address) throws IllegalArgumentException {
-		Member member = service.createMember(username, password, email, address);
+			@RequestParam Optional<String> email, @RequestParam Optional<String> address) throws IllegalArgumentException {
+		Member member = service.createMember(username, password);
+		if (email.isPresent()) {
+			service.setMemberEmail(username, email.get());
+		}
+		if (address.isPresent()) {
+			service.setMemberAddress(username, address.get());
+		}
 		return convertToDto(member);
 	}
 
 	@GetMapping(value = { "/member/{username}", "/member/{username}/" })
 	public MemberDto getMember(@PathVariable("username") String username) throws IllegalArgumentException {
 		return convertToDto(service.getMember(username));
+	}
+	
+	@GetMapping(value = { "/memberlogin/{username}", "/memberlogin/{username}/" })
+	public MemberDto verifyLogin(@PathVariable("username") String username, @RequestParam String password) throws IllegalArgumentException {
+		return convertToDto(service.verifyLogin(username, password));
 	}
 
 	@DeleteMapping(value = { "/member/{username}", "/member/{username}/" })
