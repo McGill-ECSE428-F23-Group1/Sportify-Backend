@@ -64,6 +64,7 @@ public class MemberService {
 		return areFriends(x, y);
 	}
 
+	@Transactional
 	public Member setMemberGender(String username, Gender gender) throws IllegalArgumentException {
 		Member member = getMember(username);
 		return setGender(member, gender);
