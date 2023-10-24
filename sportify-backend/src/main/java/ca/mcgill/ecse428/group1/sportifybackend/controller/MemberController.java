@@ -1,5 +1,6 @@
 package ca.mcgill.ecse428.group1.sportifybackend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -83,11 +84,37 @@ public class MemberController {
 		return convertToDto(Member);
 	}
 
+	@GetMapping(value = { "/memberfriend", "/memberfriend/" })
+	public boolean areFriends(@RequestParam String username1, @RequestParam String username2)
+			throws IllegalArgumentException {
+		return service.verifyFriendStatus(username1, username2);
+	}
+
+	@PostMapping(value = { "/memberfriend", "/memberfriend/" })
+	public void addFriend(@RequestParam String username1, @RequestParam String username2)
+			throws IllegalArgumentException {
+		service.addFriend(username1, username2);
+	}
+
+	@DeleteMapping(value = { "/memberfriend", "/memberfriend/" })
+	public void removeFriend(@RequestParam String username1, @RequestParam String username2)
+			throws IllegalArgumentException {
+		service.removeFriend(username1, username2);
+	}
+
 	private MemberDto convertToDto(Member m) throws IllegalArgumentException {
 		if (m == null) {
 			throw new IllegalArgumentException("Member does not exist!");
 		}
-		MemberDto memberDto = new MemberDto(m.getUsername(), m.getPassword(), null, m.getEmail(), m.getAddress());
+		// parse friends
+		List<String> friends = new ArrayList<>();
+		for (Member friend : m.getFriends()) {
+			friends.add(friend.getUsername());
+		}
+		// build Dto
+		MemberDto memberDto = new MemberDto(m.getUsername(), m.getPassword(), null, m.getEmail(), m.getAddress(),
+				friends);
+		// parse gender enum
 		if (m.getGender() != null) {
 			memberDto.setGender(m.getGender().toString());
 		}

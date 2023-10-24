@@ -57,6 +57,13 @@ public class MemberService {
 		return member;
 	}
 
+	@Transactional
+	public boolean verifyFriendStatus(String username1, String username2) throws IllegalArgumentException {
+		Member x = getMember(username1);
+		Member y = getMember(username2);
+		return areFriends(x, y);
+	}
+
 	public Member setMemberGender(String username, Gender gender) throws IllegalArgumentException {
 		Member member = getMember(username);
 		return setGender(member, gender);
@@ -83,12 +90,46 @@ public class MemberService {
 	@Transactional
 	public void deleteMember(String username) throws IllegalArgumentException {
 		Member member = getMember(username);
+		// remove friends foreign key constraint
+		for (Member x : member.getFriends()) {
+			x.removeFriend(member);
+			memberRepository.save(x);
+		}
 		memberRepository.delete(member);
 	}
 
 	@Transactional
 	public List<Member> getAllMembers() {
 		return memberRepository.findAllByOrderByUsername();
+	}
+
+	@Transactional
+	public void addFriend(String username1, String username2) throws IllegalArgumentException {
+		Member x = getMember(username1);
+		Member y = getMember(username2);
+		if (x.equals(y)) {
+			throw new IllegalArgumentException("Cannot add oneself as friend!");
+		}
+		if (areFriends(x, y)) {
+			throw new IllegalArgumentException("Members are already friends!");
+		}
+		x.addFriend(y);
+		y.addFriend(x);
+		memberRepository.save(x);
+		memberRepository.save(y);
+	}
+
+	@Transactional
+	public void removeFriend(String username1, String username2) throws IllegalArgumentException {
+		Member x = getMember(username1);
+		Member y = getMember(username2);
+		if (!areFriends(x, y)) {
+			throw new IllegalArgumentException("Members are not friends!");
+		}
+		x.removeFriend(y);
+		y.removeFriend(x);
+		memberRepository.save(x);
+		memberRepository.save(y);
 	}
 
 	private Member setGender(Member member, Gender gender) throws IllegalArgumentException {
@@ -121,6 +162,10 @@ public class MemberService {
 		}
 		member.setAddress(address);
 		return memberRepository.save(member);
+	}
+
+	private boolean areFriends(Member x, Member y) throws IllegalArgumentException {
+		return x.getFriends().contains(y);
 	}
 
 	/**
