@@ -1,20 +1,24 @@
 package ca.mcgill.ecse428.group1.sportifybackend.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import ca.mcgill.ecse428.group1.sportifybackend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ca.mcgill.ecse428.group1.sportifybackend.dao.MemberRepository;
-import ca.mcgill.ecse428.group1.sportifybackend.model.Gender;
-import ca.mcgill.ecse428.group1.sportifybackend.model.Member;
 
 @Service
 public class MemberService {
 	@Autowired
 	MemberRepository memberRepository;
+	@Autowired
+	SportService sportService;
+	@Autowired
+	SpecificSportService specificSportService;
 
 	@Transactional
 	public Member createMember(String username, String password) throws IllegalArgumentException {
@@ -89,12 +93,29 @@ public class MemberService {
 	}
 
 	@Transactional
+	public Set<SpecificSport> getSpecificSports(String username) throws IllegalArgumentException {
+		return getMember(username).getSports();
+	}
+
+	@Transactional
+	public Member directDeleteSpecificSport(String username, SpecificSport specificSport) throws IllegalArgumentException {
+		Member member = getMember(username);
+		member.removeSport(specificSport);
+		return memberRepository.save(member);
+	}
+
+	@Transactional
 	public void deleteMember(String username) throws IllegalArgumentException {
 		Member member = getMember(username);
 		// remove friends foreign key constraint
 		for (Member x : member.getFriends()) {
 			x.removeFriend(member);
 			memberRepository.save(x);
+		}
+		for (SpecificSport ss: member.getSports()) {
+			sportService.directDeleteSpecificSport(ss.getSport().getSportName(), ss);
+			member.removeSport(ss);
+			specificSportService.directDeleteSpecificSport(ss);
 		}
 		memberRepository.delete(member);
 	}
