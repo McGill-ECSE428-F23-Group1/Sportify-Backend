@@ -1,10 +1,14 @@
 package ca.mcgill.ecse428.group1.sportifybackend.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import ca.mcgill.ecse428.group1.sportifybackend.model.SpecificSport;
+import ca.mcgill.ecse428.group1.sportifybackend.model.SportLevel;
+import ca.mcgill.ecse428.group1.sportifybackend.service.SpecificSportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +29,8 @@ import ca.mcgill.ecse428.group1.sportifybackend.service.MemberService;
 public class MemberController {
 	@Autowired
 	private MemberService service;
+	@Autowired
+	private SpecificSportService specificSportService;
 
 	@GetMapping(value = { "/member", "/member/" })
 	public List<MemberDto> getAllMembers() {
@@ -102,6 +108,34 @@ public class MemberController {
 		service.removeFriend(username1, username2);
 	}
 
+	@PostMapping(value = { "/membersport", "/membersport/" })
+	public void addSport(@RequestParam String username, @RequestParam String sportName, @RequestParam String sportLevel)
+			throws IllegalArgumentException {
+		SportLevel sl = Arrays.stream(SportLevel.values()).filter(e -> e.name().equalsIgnoreCase(sportLevel)).
+				findAny().orElse(null);
+		if (sl == null) {
+			throw new IllegalArgumentException("Sport level cannot be empty!");
+		}
+		specificSportService.addSpecificSport(username, sportName, sl);
+	}
+
+	@PatchMapping(value = { "/membersport", "/membersport/" })
+	public void modifySport(@RequestParam String username, @RequestParam String sportName, @RequestParam String sportLevel)
+			throws IllegalArgumentException {
+		SportLevel sl = Arrays.stream(SportLevel.values()).filter(e -> e.name().equalsIgnoreCase(sportLevel)).
+				findAny().orElse(null);
+		if (sl == null) {
+			throw new IllegalArgumentException("Sport level cannot be empty!");
+		}
+		specificSportService.setSportLevel(username, sportName, sl);
+	}
+
+	@DeleteMapping(value = { "/membersport", "/membersport/" })
+	public void deleteSport(@RequestParam String username, @RequestParam String sportName)
+			throws IllegalArgumentException {
+		specificSportService.deleteSpecificSport(username, sportName);
+	}
+
 	private MemberDto convertToDto(Member m) throws IllegalArgumentException {
 		if (m == null) {
 			throw new IllegalArgumentException("Member does not exist!");
@@ -111,9 +145,13 @@ public class MemberController {
 		for (Member friend : m.getFriends()) {
 			friends.add(friend.getUsername());
 		}
+		List<String> sports = new ArrayList<>();
+		for (SpecificSport ss: m.getSports()) {
+			sports.add(ss.getSport().getSportName());
+		}
 		// build Dto
 		MemberDto memberDto = new MemberDto(m.getUsername(), m.getPassword(), null, m.getEmail(), m.getAddress(),
-				friends);
+				friends, sports);
 		// parse gender enum
 		if (m.getGender() != null) {
 			memberDto.setGender(m.getGender().toString());

@@ -7,8 +7,8 @@ import java.util.Objects;
 @Entity
 public class SpecificSport {
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @OneToOne
     private Member member;
@@ -20,7 +20,7 @@ public class SpecificSport {
 
     public SpecificSport() {}
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -36,7 +36,7 @@ public class SpecificSport {
         return sportLevel;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

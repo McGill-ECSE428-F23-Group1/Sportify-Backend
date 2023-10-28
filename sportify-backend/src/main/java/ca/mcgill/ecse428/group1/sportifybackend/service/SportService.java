@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SportService {
@@ -28,6 +29,11 @@ public class SportService {
             throw new IllegalArgumentException("Sport does not exist!");
         }
         return sport;
+    }
+
+    @Transactional
+    public List<Sport> getAllSports() {
+        return sportRepository.findAllByOrderBySportName();
     }
 
     @Transactional
@@ -57,8 +63,8 @@ public class SportService {
     }
 
     @Transactional
-    public Set<SpecificSport> getSpecificSports(String sportName) throws IllegalArgumentException {
-        return getSport(sportName).getSpecificSports();
+    public List<SpecificSport> getSpecificSports(String sportName) throws IllegalArgumentException {
+        return new ArrayList<>(getSport(sportName).getSpecificSports());
     }
 
     @Transactional

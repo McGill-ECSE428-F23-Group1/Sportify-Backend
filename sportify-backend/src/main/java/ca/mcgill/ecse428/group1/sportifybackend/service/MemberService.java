@@ -1,7 +1,7 @@
 package ca.mcgill.ecse428.group1.sportifybackend.service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import ca.mcgill.ecse428.group1.sportifybackend.model.*;
@@ -93,8 +93,8 @@ public class MemberService {
 	}
 
 	@Transactional
-	public Set<SpecificSport> getSpecificSports(String username) throws IllegalArgumentException {
-		return getMember(username).getSports();
+	public List<SpecificSport> getSpecificSports(String username) throws IllegalArgumentException {
+		return new ArrayList<>(getMember(username).getSports());
 	}
 
 	@Transactional
