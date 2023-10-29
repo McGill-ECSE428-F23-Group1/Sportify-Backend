@@ -109,7 +109,7 @@ public class MemberController {
 	}
 
 	@PostMapping(value = { "/membersport", "/membersport/" })
-	public void addSport(@RequestParam String username, @RequestParam String sportName, @RequestParam String sportLevel)
+	public MemberDto addSport(@RequestParam String username, @RequestParam String sportName, @RequestParam String sportLevel)
 			throws IllegalArgumentException {
 		SportLevel sl = Arrays.stream(SportLevel.values()).filter(e -> e.name().equalsIgnoreCase(sportLevel)).
 				findAny().orElse(null);
@@ -117,10 +117,11 @@ public class MemberController {
 			throw new IllegalArgumentException("Sport level cannot be empty!");
 		}
 		specificSportService.addSpecificSport(username, sportName, sl);
+		return convertToDto(service.getMember(username));
 	}
 
 	@PatchMapping(value = { "/membersport", "/membersport/" })
-	public void modifySport(@RequestParam String username, @RequestParam String sportName, @RequestParam String sportLevel)
+	public MemberDto modifySport(@RequestParam String username, @RequestParam String sportName, @RequestParam String sportLevel)
 			throws IllegalArgumentException {
 		SportLevel sl = Arrays.stream(SportLevel.values()).filter(e -> e.name().equalsIgnoreCase(sportLevel)).
 				findAny().orElse(null);
@@ -128,12 +129,14 @@ public class MemberController {
 			throw new IllegalArgumentException("Sport level cannot be empty!");
 		}
 		specificSportService.setSportLevel(username, sportName, sl);
+		return convertToDto(service.getMember(username));
 	}
 
 	@DeleteMapping(value = { "/membersport", "/membersport/" })
-	public void deleteSport(@RequestParam String username, @RequestParam String sportName)
+	public MemberDto deleteSport(@RequestParam String username, @RequestParam String sportName)
 			throws IllegalArgumentException {
 		specificSportService.deleteSpecificSport(username, sportName);
+		return convertToDto(service.getMember(username));
 	}
 
 	private MemberDto convertToDto(Member m) throws IllegalArgumentException {
@@ -147,7 +150,7 @@ public class MemberController {
 		}
 		List<String> sports = new ArrayList<>();
 		for (SpecificSport ss: m.getSports()) {
-			sports.add(ss.getSport().getSportName());
+			sports.add(String.format("%s;%s",ss.getSport().getSportName(), ss.getSportLevel().toString()));
 		}
 		// build Dto
 		MemberDto memberDto = new MemberDto(m.getUsername(), m.getPassword(), null, m.getEmail(), m.getAddress(),

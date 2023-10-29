@@ -38,8 +38,9 @@ public class SportController {
     }
 
     @DeleteMapping(value = { "/sport/{sportname}", "/sport/{sportname}/" })
-    public void deleteSport(@PathVariable("sportname") String sportName) throws IllegalArgumentException {
+    public List<SportDto> deleteSport(@PathVariable("sportname") String sportName) throws IllegalArgumentException {
         sportService.deleteSport(sportName);
+        return sportService.getAllSports().stream().map(p -> convertToDto(p)).collect(Collectors.toList());
     }
 
     private SportDto convertToDto(Sport s) throws IllegalArgumentException {
@@ -49,7 +50,7 @@ public class SportController {
 
         List<String> members = new ArrayList<>();
         for (SpecificSport ss: s.getSpecificSports()) {
-            members.add(ss.getMember().getUsername());
+            members.add(String.format("%s;%s",ss.getMember().getUsername(), ss.getSportLevel().toString()));
         }
 
         return new SportDto(s.getSportName(), members);
