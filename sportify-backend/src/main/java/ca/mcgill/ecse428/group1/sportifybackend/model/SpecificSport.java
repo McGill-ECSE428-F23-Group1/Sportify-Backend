@@ -1,6 +1,10 @@
 package ca.mcgill.ecse428.group1.sportifybackend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 import java.util.Objects;
 
@@ -10,7 +14,7 @@ public class SpecificSport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne
+    @ManyToOne
     private Member member;
 
     @ManyToOne

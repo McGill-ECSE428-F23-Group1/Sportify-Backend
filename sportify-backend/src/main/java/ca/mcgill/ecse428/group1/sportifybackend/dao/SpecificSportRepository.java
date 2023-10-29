@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface SpecificSportRepository extends CrudRepository<SpecificSport, String> {
 
+    SpecificSport findById(long id);
+
     SpecificSport findByMemberAndSport(Member member, Sport sport);
 
     List<SpecificSport> findByMember(Member member);

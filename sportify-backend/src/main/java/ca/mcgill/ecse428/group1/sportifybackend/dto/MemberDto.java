@@ -10,10 +10,10 @@ public class MemberDto {
 	private String email;
 	private String address;
 	private List<String> friends; // to prevent infinite loop when fetching, only friend username is kept in Dto
-	private List<String> sports;	// list of names of sports the member plays
+	private List<SpecificSportDto> sports;	// list of names of sports the member plays
 
 	public MemberDto(String username, String password, String gender, String email, String address,
-			List<String> friends, List<String> sports) {
+			List<String> friends, List<SpecificSportDto> sports) {
 		this.username = username;
 		this.password = password;
 		this.gender = gender;
@@ -71,11 +71,11 @@ public class MemberDto {
 		this.friends = friends;
 	}
 
-	public List<String> getSports() {
+	public List<SpecificSportDto> getSports() {
 		return sports;
 	}
 
-	public void setSports(List<String> sports) {
+	public void setSports(List<SpecificSportDto> sports) {
 		this.sports = sports;
 	}
 }

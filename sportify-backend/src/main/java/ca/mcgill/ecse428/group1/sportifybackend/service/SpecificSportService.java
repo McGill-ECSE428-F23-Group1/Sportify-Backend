@@ -2,7 +2,6 @@ package ca.mcgill.ecse428.group1.sportifybackend.service;
 
 import ca.mcgill.ecse428.group1.sportifybackend.dao.MemberRepository;
 import ca.mcgill.ecse428.group1.sportifybackend.dao.SpecificSportRepository;
-import ca.mcgill.ecse428.group1.sportifybackend.dao.SportRepository;
 import ca.mcgill.ecse428.group1.sportifybackend.model.Member;
 import ca.mcgill.ecse428.group1.sportifybackend.model.SpecificSport;
 import ca.mcgill.ecse428.group1.sportifybackend.model.Sport;
@@ -11,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class SpecificSportService {
     @Autowired
@@ -18,11 +20,19 @@ public class SpecificSportService {
     @Autowired
     MemberRepository memberRepository;
     @Autowired
-    SportRepository sportRepository;
-    @Autowired
     MemberService memberService;
     @Autowired
     SportService sportService;
+
+    @Transactional
+    public List<SpecificSport> getSpecificSportsByMember(String username) throws IllegalArgumentException {
+        return new ArrayList<>(memberService.getMember(username).getSports());
+    }
+
+    @Transactional
+    public List<SpecificSport> getSpecificSportsBySport(String sportName) throws IllegalArgumentException {
+        return new ArrayList<>(specificSportRepository.findBySport(sportService.getSport(sportName)));
+    }
 
     @Transactional
     public SpecificSport getSpecificSport(String username, String sportName) throws IllegalArgumentException {
@@ -34,8 +44,8 @@ public class SpecificSportService {
         }
         Sport sport = sportService.getSport(sportName);
 
-        for (SpecificSport ss: memberService.getSpecificSports(username)) {
-            if (ss.getSport() == sport) {
+        for (SpecificSport ss: memberService.getMember(username).getSports()) {
+            if (ss.getSport().equals(sport)) {
                 return ss;
             }
         }
@@ -58,7 +68,7 @@ public class SpecificSportService {
         Sport sport = sportService.getSport(sportName);
 
         for (SpecificSport ss: member.getSports()) {
-            if (ss.getSport() == sport) {
+            if (ss.getSport().equals(sport)) {
                 throw new IllegalArgumentException("Member already plays the sport!");
             }
         }
@@ -71,8 +81,6 @@ public class SpecificSportService {
 
         member.addSport(specificSport);
         memberRepository.save(member);
-        sport.addSpecificSport(specificSport);
-        sportRepository.save(sport);
 
         return specificSport;
     }
@@ -92,7 +100,7 @@ public class SpecificSportService {
         Sport sport = sportService.getSport(sportName);
 
         for (SpecificSport ss: member.getSports()) {
-            if (ss.getSport() == sport) {
+            if (ss.getSport().equals(sport)) {
                 ss.setSportLevel(sportLevel);
                 return specificSportRepository.save(ss);
             }
@@ -102,22 +110,17 @@ public class SpecificSportService {
     }
 
     @Transactional
-    public void deleteSpecificSport(String username, String sportName) throws IllegalArgumentException {
-        if (username == null || username.trim().length() == 0) {
-            throw new IllegalArgumentException("Username cannot be empty!");
-        }
-        if (sportName == null || sportName.trim().length() == 0) {
-            throw new IllegalArgumentException("Sport name cannot be empty!");
-        }
-        SpecificSport specificSport = getSpecificSport(username, sportName);
+    public void deleteSpecificSport(long id) throws IllegalArgumentException {
+        SpecificSport specificSport = specificSportRepository.findById(id);
 
-        memberService.directDeleteSpecificSport(username, specificSport);
-        sportService.directDeleteSpecificSport(sportName, specificSport);
-        specificSportRepository.delete(specificSport);
-    }
+        if (specificSport == null) {
+            throw new IllegalArgumentException("Specific sport does not exist!");
+        }
 
-    @Transactional
-    public void directDeleteSpecificSport(SpecificSport specificSport) throws IllegalArgumentException {
+        Member member = specificSport.getMember();
+        member.removeSport(specificSport);
+        memberRepository.save(member);
+
         specificSportRepository.delete(specificSport);
     }
 }

@@ -1,13 +1,15 @@
 package ca.mcgill.ecse428.group1.sportifybackend.service;
 
+import ca.mcgill.ecse428.group1.sportifybackend.dao.MemberRepository;
+import ca.mcgill.ecse428.group1.sportifybackend.dao.SpecificSportRepository;
 import ca.mcgill.ecse428.group1.sportifybackend.dao.SportRepository;
+import ca.mcgill.ecse428.group1.sportifybackend.model.Member;
 import ca.mcgill.ecse428.group1.sportifybackend.model.SpecificSport;
 import ca.mcgill.ecse428.group1.sportifybackend.model.Sport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -15,9 +17,9 @@ public class SportService {
     @Autowired
     SportRepository sportRepository;
     @Autowired
-    MemberService memberService;
+    MemberRepository memberRepository;
     @Autowired
-    SpecificSportService specificSportService;
+    SpecificSportRepository specificSportRepository;
 
     @Transactional
     public Sport getSport(String sportName) throws IllegalArgumentException {
@@ -49,40 +51,39 @@ public class SportService {
         return sportRepository.save(sport);
     }
 
-    @Transactional
-    public Sport setSportName(String oldName, String newName) throws IllegalArgumentException {
-        if (oldName == null || oldName.trim().length() == 0) {
-            throw new IllegalArgumentException("Sport does not exist!");
-        }
-        Sport sport = sportRepository.findBySportName(oldName);
-        if (sport == null) {
-            throw new IllegalArgumentException("Sport does not exist!");
-        }
-        sport.setSportName(newName);
-        return sportRepository.save(sport);
-    }
-
-    @Transactional
-    public List<SpecificSport> getSpecificSports(String sportName) throws IllegalArgumentException {
-        return new ArrayList<>(getSport(sportName).getSpecificSports());
-    }
-
-    @Transactional
-    public Sport directDeleteSpecificSport(String sportName, SpecificSport specificSport) throws IllegalArgumentException {
-        Sport sport = getSport(sportName);
-        sport.removeSpecificSport(specificSport);
-        return sportRepository.save(sport);
-    }
+//    @Transactional
+//    public Sport setSportName(String oldName, String newName) throws IllegalArgumentException {
+//        if (oldName == null || oldName.trim().length() == 0) {
+//            throw new IllegalArgumentException("Sport does not exist!");
+//        }
+//        Sport sport = sportRepository.findBySportName(oldName);
+//        if (sport == null) {
+//            throw new IllegalArgumentException("Sport does not exist!");
+//        }
+//        sport.setSportName(newName);
+//        return sportRepository.save(sport);
+//    }
 
     @Transactional
     public void deleteSport(String sportName) throws IllegalArgumentException {
-        // remove all instances of specificsport from members
         Sport sport = getSport(sportName);
 
-        for (SpecificSport ss: sport.getSpecificSports()) {
-            memberService.directDeleteSpecificSport(ss.getMember().getUsername(), ss);
-            sport.removeSpecificSport(ss);
-            specificSportService.directDeleteSpecificSport(ss);
+//        for (Member m: memberRepository.findAllByOrderByUsername()) {
+//            for (SpecificSport ss: m.getSports()) {
+//                if (ss.getSport().equals(sport)) {
+//                    m.removeSport(ss);
+//                    memberRepository.save(m);
+//                }
+//            }
+//        }
+
+        List<SpecificSport> sports = specificSportRepository.findBySport(sport);
+
+        for (SpecificSport ss: sports) {
+            Member m = ss.getMember();
+            m.removeSport(ss);
+            memberRepository.save(m);
+            specificSportRepository.delete(ss);
         }
 
         sportRepository.delete(sport);
