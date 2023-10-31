@@ -68,19 +68,10 @@ public class SportService {
     public void deleteSport(String sportName) throws IllegalArgumentException {
         Sport sport = getSport(sportName);
 
-//        for (Member m: memberRepository.findAllByOrderByUsername()) {
-//            for (SpecificSport ss: m.getSports()) {
-//                if (ss.getSport().equals(sport)) {
-//                    m.removeSport(ss);
-//                    memberRepository.save(m);
-//                }
-//            }
-//        }
-
         List<SpecificSport> sports = specificSportRepository.findBySport(sport);
 
         for (SpecificSport ss: sports) {
-            Member m = ss.getMember();
+            Member m = memberRepository.findBySportsContaining(ss);
             m.removeSport(ss);
             memberRepository.save(m);
             specificSportRepository.delete(ss);

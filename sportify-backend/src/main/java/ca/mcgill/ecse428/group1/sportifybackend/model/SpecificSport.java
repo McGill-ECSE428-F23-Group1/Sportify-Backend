@@ -15,21 +15,12 @@ public class SpecificSport {
     private long id;
 
     @ManyToOne
-    private Member member;
-
-    @ManyToOne
     private Sport sport;
 
     private SportLevel sportLevel;
 
-    public SpecificSport() {}
-
     public long getId() {
         return id;
-    }
-
-    public Member getMember() {
-        return member;
     }
 
     public Sport getSport() {
@@ -42,10 +33,6 @@ public class SpecificSport {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
     }
 
     public void setSport(Sport sport) {
@@ -65,7 +52,6 @@ public class SpecificSport {
         if (getClass() != obj.getClass())
             return false;
         SpecificSport other = (SpecificSport) obj;
-        return Objects.equals(member.getUsername(), other.getMember().getUsername()) &&
-                Objects.equals(sport.getSportName(), other.getSport().getSportName());
+        return Objects.equals(id, other.getId());
     }
 }

@@ -64,7 +64,6 @@ public class SportController {
             throw new IllegalArgumentException("Specific sport does not exist!");
         }
 
-        return new SpecificSportDto(ss.getId(), ss.getMember().getUsername(), ss.getSport().getSportName(),
-                ss.getSportLevel().toString());
+        return new SpecificSportDto(ss.getId(), ss.getSport().getSportName(), ss.getSportLevel().toString());
     }
 }

@@ -74,7 +74,6 @@ public class SpecificSportService {
         }
 
         SpecificSport specificSport = new SpecificSport();
-        specificSport.setMember(member);
         specificSport.setSport(sport);
         specificSport.setSportLevel(sportLevel);
         specificSportRepository.save(specificSport);
@@ -117,7 +116,7 @@ public class SpecificSportService {
             throw new IllegalArgumentException("Specific sport does not exist!");
         }
 
-        Member member = specificSport.getMember();
+        Member member = memberRepository.findBySportsContaining(specificSport);
         member.removeSport(specificSport);
         memberRepository.save(member);
 

@@ -114,8 +114,7 @@ public class MemberController {
 		}
 		List<SpecificSportDto> sports = new ArrayList<>();
 		for (SpecificSport ss: m.getSports()) {
-			sports.add(new SpecificSportDto(ss.getId(), ss.getMember().getUsername(), ss.getSport().getSportName(),
-					ss.getSportLevel().toString()));
+			sports.add(new SpecificSportDto(ss.getId(), ss.getSport().getSportName(), ss.getSportLevel().toString()));
 		}
 		// build Dto
 		MemberDto memberDto = new MemberDto(m.getUsername(), m.getPassword(), null, m.getEmail(), m.getAddress(),
