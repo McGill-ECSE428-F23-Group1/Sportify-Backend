@@ -1,10 +1,11 @@
 package ca.mcgill.ecse428.group1.sportifybackend.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import ca.mcgill.ecse428.group1.sportifybackend.dto.MemberDto;
+import ca.mcgill.ecse428.group1.sportifybackend.dto.SpecificSportDto;
+import ca.mcgill.ecse428.group1.sportifybackend.model.Gender;
+import ca.mcgill.ecse428.group1.sportifybackend.model.Member;
+import ca.mcgill.ecse428.group1.sportifybackend.model.SpecificSport;
+import ca.mcgill.ecse428.group1.sportifybackend.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ca.mcgill.ecse428.group1.sportifybackend.dto.MemberDto;
-import ca.mcgill.ecse428.group1.sportifybackend.model.Gender;
-import ca.mcgill.ecse428.group1.sportifybackend.model.Member;
-import ca.mcgill.ecse428.group1.sportifybackend.service.MemberService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -111,9 +112,13 @@ public class MemberController {
 		for (Member friend : m.getFriends()) {
 			friends.add(friend.getUsername());
 		}
+		List<SpecificSportDto> sports = new ArrayList<>();
+		for (SpecificSport ss: m.getSports()) {
+			sports.add(new SpecificSportDto(ss.getId(), ss.getSport().getSportName(), ss.getSportLevel().toString()));
+		}
 		// build Dto
 		MemberDto memberDto = new MemberDto(m.getUsername(), m.getPassword(), null, m.getEmail(), m.getAddress(),
-				friends);
+				friends, sports);
 		// parse gender enum
 		if (m.getGender() != null) {
 			memberDto.setGender(m.getGender().toString());

@@ -1,13 +1,14 @@
 package ca.mcgill.ecse428.group1.sportifybackend.model;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Member {
@@ -19,9 +20,12 @@ public class Member {
 	private String address;
 	@ManyToMany(fetch = FetchType.EAGER)
 	private Set<Member> friends;
+	@OneToMany(fetch = FetchType.EAGER)
+	private Set<SpecificSport> sports;
 
 	public Member() {
 		this.friends = new HashSet<>();
+		this.sports = new HashSet<>();
 	}
 
 	public String getUsername() {
@@ -48,6 +52,10 @@ public class Member {
 		return this.friends;
 	}
 
+	public Set<SpecificSport> getSports() {
+		return sports;
+	}
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -72,12 +80,24 @@ public class Member {
 		this.friends = set;
 	}
 
+	public void setSports(Set<SpecificSport> sports) {
+		this.sports = sports;
+	}
+
 	public boolean addFriend(Member m) {
 		return this.friends.add(m);
 	}
 
 	public boolean removeFriend(Member m) {
 		return this.friends.remove(m);
+	}
+
+	public boolean addSport(SpecificSport s) {
+		return this.sports.add(s);
+	}
+
+	public boolean removeSport(SpecificSport s) {
+		return this.sports.remove(s);
 	}
 
 	@Override
