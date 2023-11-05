@@ -103,7 +103,7 @@ public class MemberController {
 		service.removeFriend(username1, username2);
 	}
 
-	private MemberDto convertToDto(Member m) throws IllegalArgumentException {
+	public MemberDto convertToDto(Member m) throws IllegalArgumentException {
 		if (m == null) {
 			throw new IllegalArgumentException("Member does not exist!");
 		}
