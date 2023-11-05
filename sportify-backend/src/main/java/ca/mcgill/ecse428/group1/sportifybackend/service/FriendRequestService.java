@@ -28,6 +28,10 @@ public class FriendRequestService {
         if (checkFriendRequest != null && checkFriendRequest.getStatus() == FriendRequestStatus.PENDING) {
             throw new IllegalArgumentException("Friend request already exists!");
         }
+        FriendRequest checkFriendRequest2 = friendRequestRepository.findFriendRequestBySenderAndReceiver(memberService.getMember(receiverUsername), memberService.getMember(senderUsername));
+        if (checkFriendRequest2 != null && checkFriendRequest2.getStatus() == FriendRequestStatus.PENDING) {
+            throw new IllegalArgumentException("This person already sent you a friend request!");
+        }
         FriendRequest friendRequest = new FriendRequest();
         friendRequest.setMessage(message);
         friendRequest.setSender(memberService.getMember(senderUsername));
