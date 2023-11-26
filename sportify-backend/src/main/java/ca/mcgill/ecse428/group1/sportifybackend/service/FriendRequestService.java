@@ -23,7 +23,9 @@ public class FriendRequestService {
 
     @Transactional
     public FriendRequest createFriendRequest(String message, String senderUsername, String receiverUsername) throws IllegalArgumentException{
-
+        if (memberService.areFriends(memberService.getMember(senderUsername), memberService.getMember(receiverUsername))) {
+            throw new IllegalArgumentException("This person is already your friend!");
+        }
         FriendRequest checkFriendRequest = friendRequestRepository.findFriendRequestBySenderAndReceiver(memberService.getMember(senderUsername), memberService.getMember(receiverUsername));
         if (checkFriendRequest != null && checkFriendRequest.getStatus() == FriendRequestStatus.PENDING) {
             throw new IllegalArgumentException("Friend request already exists!");
