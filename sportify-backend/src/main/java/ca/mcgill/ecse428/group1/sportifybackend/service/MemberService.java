@@ -1,10 +1,7 @@
 package ca.mcgill.ecse428.group1.sportifybackend.service;
 
-import ca.mcgill.ecse428.group1.sportifybackend.dao.MemberRepository;
-import ca.mcgill.ecse428.group1.sportifybackend.dao.SpecificSportRepository;
-import ca.mcgill.ecse428.group1.sportifybackend.model.Gender;
-import ca.mcgill.ecse428.group1.sportifybackend.model.Member;
-import ca.mcgill.ecse428.group1.sportifybackend.model.SpecificSport;
+import ca.mcgill.ecse428.group1.sportifybackend.dao.*;
+import ca.mcgill.ecse428.group1.sportifybackend.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 @Service
 public class MemberService {
@@ -19,6 +17,12 @@ public class MemberService {
 	MemberRepository memberRepository;
 	@Autowired
 	SpecificSportRepository specificSportRepository;
+	@Autowired
+	FriendRequestRepository friendRequestRepository;
+	@Autowired
+	ChatRepository chatRepository;
+	@Autowired
+	MessageRepository messageRepository;
 
 	@Transactional
 	public Member createMember(String username, String password) throws IllegalArgumentException {
@@ -106,6 +110,15 @@ public class MemberService {
 			member.removeSport(ss);
 			specificSportRepository.delete(ss);
 		}
+		// Remove all friend requests
+		friendRequestRepository.deleteAll(friendRequestRepository.findFriendRequestBySender(member));
+		friendRequestRepository.deleteAll(friendRequestRepository.findFriendRequestByReceiver(member));
+		// Remove all chats and messages
+		Stream.concat(chatRepository.findChatsByMember1(member).stream(), chatRepository.findChatsByMember2(member).stream())
+				.forEach(chat -> {
+					messageRepository.deleteAll(chat.getMessages());
+					chatRepository.delete(chat);
+				});
 		memberRepository.delete(member);
 	}
 
@@ -175,7 +188,7 @@ public class MemberService {
 		return memberRepository.save(member);
 	}
 
-	private boolean areFriends(Member x, Member y) throws IllegalArgumentException {
+	public boolean areFriends(Member x, Member y) throws IllegalArgumentException {
 		return x.getFriends().contains(y);
 	}
 
