@@ -27,7 +27,10 @@ public class ChatService {
         if (member2Username == null || member2Username.trim().length() == 0) {
             throw new IllegalArgumentException("Member2 username cannot be empty!");
         }
-
+        // check if chat already exists:
+        if (checkIfChatExists(member1Username, member2Username)) {
+            throw new IllegalArgumentException("Chat already exists!");
+        }
         Member member1 = memberService.getMember(member1Username);
         Member member2 = memberService.getMember(member2Username);
         Chat chat = new Chat();
