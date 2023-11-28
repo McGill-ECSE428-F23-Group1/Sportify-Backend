@@ -71,7 +71,7 @@ public class ChatService {
         }
 
         if (chat == null && chat2 == null) {
-            throw new IllegalArgumentException("Chat does not exist!");
+            chat = createChat(member1Username, member2Username);
         }
 
         return chat == null ? chat2 : chat;
